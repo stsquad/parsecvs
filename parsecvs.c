@@ -744,11 +744,9 @@ static void load_status (char *name)
     if (rev_mode == ExecuteGraph)
 	return;
     l = strlen (name);
-    if (l > 35) name += l - 35;
+    if (l > 55) name += l - 35;
 
-    fprintf (STATUS, "Load: %35.35s ", name);
-    for (s = 0; s < PROGRESS_LEN + 1; s++)
-	putc (s == spot ? '*' : '.', STATUS);
+    fprintf (STATUS, "Load: %55.55s ", name);
     fprintf (STATUS, " %5d of %5d\n", load_current_file, load_total_files);
     fflush (STATUS);
 }
