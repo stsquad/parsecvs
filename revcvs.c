@@ -635,13 +635,27 @@ rev_list_cvs (cvs_file *cvs)
 #endif
     
     for (cv = cvs->versions; cv; cv = cv->next) {
+#if DEBUG
+	printf ("  version %p\n", cv);
+#endif
 	for (cb = cv->branches; cb; cb = cb->next)
 	{
+#if DEBUG
+	    printf ("    branch %p\n", cb);
+#endif
 	    branch = rev_branch_cvs (cvs, &cb->number);
 	    rev_list_add_head (rl, branch, NULL, 0);
 	}
     }
+#if DEBUG
+    printf ("generate file\n");
+#endif
     generate_files(cvs);
+
+#if DEBUG
+    printf ("do revlist stuff\n");
+#endif
+    
     rev_list_patch_vendor_branch (rl, cvs);
     rev_list_graft_branches (rl, cvs);
     rev_list_set_refs (rl, cvs);
