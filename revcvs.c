@@ -20,6 +20,44 @@
 
 #define DEBUG 1
 
+
+/*
+  Debug code, dump the contents of a branch for a given file
+*/
+
+static void dump_cvs_number(cvs_number *number)
+{
+    int i;
+    if (number) {
+	for (i=0; i<number->c; i++) {
+	    printf("%d", number->n[i]);
+	    if (i < number->c - 1) printf (".");
+	}
+    }
+}
+
+static void dump_cvs_version(cvs_version *version)
+{
+    printf("dump_cvs_version: %p\n", version);
+//    printf("  author: %p\n", version->author);
+    printf("  version:");
+    dump_cvs_number(&version->number);
+    printf("\n");
+    printf("  parent version:");
+    dump_cvs_number(&version->parent);
+    printf("\n");
+    printf("  branches = %p\n", version->branches);
+}
+
+static void dump_branch(cvs_branch *branch)
+{
+    if (branch) {
+	printf ("    branch %p:", branch);
+	dump_cvs_number(&branch->number);
+	printf ("\n");
+    }
+}
+
 /*
  * Given a single-file tree, locate the specific version number
  */
@@ -612,7 +650,15 @@ rev_list_cvs (cvs_file *cvs)
 	    (!ctrunk || cvs_number_compare (&cv->number,
 					    &ctrunk->number) < 0))
 	{
+#if DEBUG
+	    printf("rev_list_cvs: ctrunk = %p\n", cv);
+#endif
 	    ctrunk = cv;
+	}
+	else {
+#if DEBUG
+	    printf("rev_list_cvs: skipping %p\n", cv);
+#endif
 	}
     }
     /*
@@ -636,12 +682,12 @@ rev_list_cvs (cvs_file *cvs)
     
     for (cv = cvs->versions; cv; cv = cv->next) {
 #if DEBUG
-	printf ("  version %p\n", cv);
+	dump_cvs_version(cv);
 #endif
 	for (cb = cv->branches; cb; cb = cb->next)
 	{
 #if DEBUG
-	    printf ("    branch %p\n", cb);
+	    dump_branch(cb);
 #endif
 	    branch = rev_branch_cvs (cvs, &cb->number);
 	    rev_list_add_head (rl, branch, NULL, 0);
