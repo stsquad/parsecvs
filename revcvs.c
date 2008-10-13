@@ -18,7 +18,7 @@
 
 #include "cvs.h"
 
-#define DEBUG 1
+//#define DEBUG 1
 
 
 /*
@@ -47,6 +47,17 @@ static void dump_cvs_version(cvs_version *version)
     dump_cvs_number(&version->parent);
     printf("\n");
     printf("  branches = %p\n", version->branches);
+}
+
+static void dump_cvs_file(cvs_file *file)
+{
+    if (file) {
+	printf("cvs_file: %p\n", file);
+	printf("  name: %s\n", file->name);
+	printf("  head:"); dump_cvs_number(&file->head); printf("\n");
+	printf("  branch:"); dump_cvs_number(&file->branch); printf("\n");
+	printf("  nversions:%d\n", file->nversions);
+    }
 }
 
 static void dump_branch(cvs_branch *branch)
@@ -641,6 +652,9 @@ rev_list_cvs (cvs_file *cvs)
     rev_ref	*t;
     cvs_version	*ctrunk = NULL;
 
+    printf("rev_list_cvs: %p\n", cvs);
+    dump_cvs_file(cvs);
+    
     build_branches();
     /*
      * Locate first revision on trunk branch
@@ -709,5 +723,8 @@ rev_list_cvs (cvs_file *cvs)
     rev_list_set_tail (rl);
     rev_list_free_dead_files (rl);
     rev_list_validate (rl);
+
+    printf("rev_list_cvs: done\n");
+//    dump_cvs_file(cvs);
     return rl;
 }
