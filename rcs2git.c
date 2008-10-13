@@ -28,7 +28,7 @@
 #include <stdarg.h>
 #include "cvs.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 typedef unsigned char uchar;
 struct alloclist {
@@ -865,7 +865,7 @@ void generate_files(cvs_file *cvs)
 			out_buffer_cleanup();
 			strncpy(sha1_ascii, sha1_to_hex(sha1), 41);
 			node->file->sha1 = atom(sha1_ascii);
-#ifdef DEBUG
+#if DEBUG
 			printf("file sha1: %s\n", node->file->sha1);
 #endif
 		}

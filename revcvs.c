@@ -18,7 +18,7 @@
 
 #include "cvs.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 /*
  * Given a single-file tree, locate the specific version number
