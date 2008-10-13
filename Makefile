@@ -2,7 +2,7 @@ GCC_WARNINGS1=-Wall -Wpointer-arith -Wstrict-prototypes
 GCC_WARNINGS2=-Wmissing-prototypes -Wmissing-declarations
 GCC_WARNINGS3=-Wnested-externs -fno-strict-aliasing
 GCC_WARNINGS=$(GCC_WARNINGS1) $(GCC_WARNINGS2) $(GCC_WARNINGS3)
-CFLAGS=-O2 -g $(GCC_WARNINGS) -I../git.git -DSHA1_HEADER='<openssl/sha.h>'
+CFLAGS=-O0 -g $(GCC_WARNINGS) -I../git.git -DSHA1_HEADER='<openssl/sha.h>'
 GITPATH=../git.git
 LIBS=-L$(GITPATH) -lgit -lssl -lcrypto -lz
 YFLAGS=-d -l
