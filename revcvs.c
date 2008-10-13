@@ -18,7 +18,7 @@
 
 #include "cvs.h"
 
-//#define DEBUG 1
+#define DEBUG 1
 
 
 /*
@@ -658,30 +658,36 @@ rev_list_cvs (cvs_file *cvs)
     build_branches();
     /*
      * Locate first revision on trunk branch
+     *
+     * If the revision number is two numbers (1.n) we are on the trunk
+     * branch, keep going until we have the lowest such number.
+     *
+     * Should this always end at 1.1?
      */
     for (cv = cvs->versions; cv; cv = cv->next) {
 	if (cvs_is_trunk (&cv->number) &&
 	    (!ctrunk || cvs_number_compare (&cv->number,
 					    &ctrunk->number) < 0))
 	{
-#if DEBUG
-	    printf("rev_list_cvs: ctrunk = %p\n", cv);
-#endif
 	    ctrunk = cv;
-	}
-	else {
-#if DEBUG
-	    printf("rev_list_cvs: skipping %p\n", cv);
-#endif
 	}
     }
     /*
      * Generate trunk branch
      */
-    if (ctrunk)
+    if (ctrunk) {
+#if DEBUG
+	printf("rev_list_cvs: ctrunk = %p number:", ctrunk);
+	dump_cvs_number(&ctrunk->number);
+	printf("\n");
+#endif
 	trunk_number = ctrunk->number;
-    else
+    } else {
+#if DEBUG
+	printf("couldn't find ctrunk, faking it\n");
+#endif
 	trunk_number = lex_number ("1.1");
+    }
     trunk = rev_branch_cvs (cvs, &trunk_number);
     if (trunk) {
 	t = rev_list_add_head (rl, trunk, atom ("master"), 2);
