@@ -625,13 +625,16 @@ rev_branch_merge (rev_ref **branches, int nbranch,
 		nlive++;
 		while (c && !c->tail) {
 			if (!start || time_compare(c->date, start) < 0)
+			    {
+//				printf("  1:setting start=%ld:%s (from %s)\n", start, ctime_nonl(&start), c->file->name);
 				start = c->date;
+			    }
 			c = c->parent;
 		}
 		if (c && (c->file || c->date != c->parent->date)) {
 			if (!start || time_compare(c->date, start) < 0) {
+//				printf("  2:setting start=%ld:%s (from %s)\n", start, ctime_nonl(&start), c->file->name);
 				start = c->date;
-//				printf("  setting start=%ld (from %s)\n", start, c->file->name);
 			}
 		}
 	}
@@ -649,8 +652,12 @@ rev_branch_merge (rev_ref **branches, int nbranch,
 		if (!start || time_compare(start, c->date) >= 0)
 			continue;
 		if (c->file) {
-			printf(	"Warning: %s too late date through branch %s (%ld:%ld=%ld)\n",
-				c->file->name, branch->name, start, c->date, start-c->date);
+		    /*
+		      This case can occur if files have been added to
+		      a branch since it's creation.
+		    */
+			printf(	"Warning: %s too late date %s through branch %s (%ld:%ld=%ld)\n",
+				c->file->name, ctime_nonl(&c->date), branch->name, start, c->date, start-c->date);
 			continue;
 		}
 		commits[n] = NULL;
