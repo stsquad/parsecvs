@@ -163,7 +163,9 @@ lex_date (cvs_number *n)
 	tm.tm_min = n->n[4];
 	tm.tm_sec = n->n[5];
 	tm.tm_isdst = 0;
+#ifdef _BSD_SOURCE
 	tm.tm_zone = 0;
+#endif
 	d = mktime (&tm);
 	if (d == 0) {
 	    int i;

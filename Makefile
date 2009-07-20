@@ -4,16 +4,17 @@ GCC_WARNINGS3=-Wnested-externs -fno-strict-aliasing
 GCC_WARNINGS=$(GCC_WARNINGS1) $(GCC_WARNINGS2) $(GCC_WARNINGS3)
 CFLAGS=-O2 -g $(GCC_WARNINGS) -I../git -DSHA1_HEADER='<openssl/sha.h>'
 GITPATH=../git
-LIBS=-L$(GITPATH) -lgit $(GITPATH)/xdiff/lib.a -lssl -lcrypto -lz
+LIBS=-L$(GITPATH) -lgit $(GITPATH)/xdiff/lib.a -lssl -lcrypto -lz -liconv
 YFLAGS=-d -l
 LFLAGS=-l
+CC=cc
 
 OBJS=gram.o lex.o parsecvs.o cvsutil.o revdir.o \
 	revlist.o atom.o revcvs.o git.o gitutil.o rcs2git.o \
 	nodehash.o tags.o tree.o
 
 parsecvs: $(OBJS)
-	cc $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
 
 $(OBJS): cvs.h
 lex.o: y.tab.h
