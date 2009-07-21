@@ -24,6 +24,6 @@ lex.o: lex.c
 y.tab.h: gram.c
 
 clean:
-	rm -f $(OBJS) y.tab.h gram.c lex.c parsecvs
+	rm -f $(OBJS) y.tab.h gram.c lex.c parsecvs parsecvs.exe
 install:
 	cp parsecvs edit-change-log ${HOME}/bin
