@@ -606,6 +606,9 @@ rev_branch_merge (rev_ref **branches, int nbranch,
 
 	ALLOC((commits = calloc (nbranch, sizeof (rev_commit *))), "rev_branch_merge");
 	nlive = 0;
+
+//	printf("rev_branch_merge: nbranch=%d\n", nbranch);
+	
 	for (n = 0; n < nbranch; n++) {
 		rev_commit *c;
 		/*
@@ -624,25 +627,41 @@ rev_branch_merge (rev_ref **branches, int nbranch,
 		nlive++;
 		while (c && !c->tail) {
 			if (!start || time_compare(c->date, start) < 0)
+			    {
+//				printf("  1:setting start=%ld:%s (from %s)\n", start, ctime_nonl(&start), c->file->name);
 				start = c->date;
+			    }
 			c = c->parent;
 		}
 		if (c && (c->file || c->date != c->parent->date)) {
-			if (!start || time_compare(c->date, start) < 0)
+			if (!start || time_compare(c->date, start) < 0) {
+//				printf("  2:setting start=%ld:%s (from %s)\n", start, ctime_nonl(&start), c->file->name);
 				start = c->date;
+			}
 		}
 	}
 
 	for (n = 0; n < nbranch; n++) {
 		rev_commit *c = commits[n];
+
+#if 0
+		printf("Doing commit %p: @ %ld\n", c, c->date);
+		if (c->file) printf("  %s\n", c->file->name);
+#endif
+		
 		if (!c->tailed)
 			continue;
 		if (!start || time_compare(start, c->date) >= 0)
 			continue;
-		if (c->file)
-			fprintf(stderr,
-				"Warning: %s too late date through branch %s\n",
-					c->file->name, branch->name);
+		if (c->file) {
+		    /*
+		      This case can occur if files have been added to
+		      a branch since it's creation.
+		    */
+			printf(	"Warning: %s too late date %s through branch %s (%ld:%ld=%ld)\n",
+				c->file->name, ctime_nonl(&c->date), branch->name, start, c->date, start-c->date);
+			continue;
+		}
 		commits[n] = NULL;
 	}
 	/*
@@ -787,10 +806,12 @@ Kill:
 				      &commits[present]->file->number);
 		fprintf (stderr, "\n");
 		fprintf (stderr, "\tbranch(%3d): %s  ", n,
-			 ctime_nonl (&prev->file->date));
-		dump_number_file (stderr,
+			 prev->file?ctime_nonl (&prev->file->date):"no file");
+		if (prev->file) {
+		    dump_number_file (stderr,
 				  prev->file->name,
 				  &prev->file->number);
+		}
 		fprintf (stderr, "\n");
 	    }
 	} else if ((*tail = rev_commit_locate_date (branch->parent,

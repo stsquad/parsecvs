@@ -18,7 +18,56 @@
 
 #include "cvs.h"
 
-#define DEBUG 0
+#define DEBUG 1
+
+
+/*
+  Debug code, dump the contents of a branch for a given file
+*/
+
+static void dump_cvs_number(cvs_number *number)
+{
+    int i;
+    if (number) {
+	for (i=0; i<number->c; i++) {
+	    printf("%d", number->n[i]);
+	    if (i < number->c - 1) printf (".");
+	}
+    }
+}
+
+static void dump_cvs_version(cvs_version *version)
+{
+    printf("dump_cvs_version: %p\n", version);
+//    printf("  author: %p\n", version->author);
+    printf("  version:");
+    dump_cvs_number(&version->number);
+    printf("\n");
+    printf("  parent version:");
+    dump_cvs_number(&version->parent);
+    printf("\n");
+    printf("  branches = %p\n", version->branches);
+}
+
+static void dump_cvs_file(cvs_file *file)
+{
+    if (file) {
+	printf("cvs_file: %p\n", file);
+	printf("  name: %s\n", file->name);
+	printf("  head:"); dump_cvs_number(&file->head); printf("\n");
+	printf("  branch:"); dump_cvs_number(&file->branch); printf("\n");
+	printf("  nversions:%d\n", file->nversions);
+    }
+}
+
+static void dump_branch(cvs_branch *branch)
+{
+    if (branch) {
+	printf ("    branch %p:", branch);
+	dump_cvs_number(&branch->number);
+	printf ("\n");
+    }
+}
 
 /*
  * Given a single-file tree, locate the specific version number
@@ -603,11 +652,19 @@ rev_list_cvs (cvs_file *cvs)
     rev_ref	*t;
     cvs_version	*ctrunk = NULL;
 
-    ALLOC((rl = calloc (1, sizeof (rev_list))), "rev_list_cvs");
+    printf("rev_list_cvs: %p\n", cvs);
+    dump_cvs_file(cvs);
 
+    ALLOC((rl = calloc (1, sizeof (rev_list))), "rev_list_cvs");
+    
     build_branches();
     /*
      * Locate first revision on trunk branch
+     *
+     * If the revision number is two numbers (1.n) we are on the trunk
+     * branch, keep going until we have the lowest such number.
+     *
+     * Should this always end at 1.1?
      */
     for (cv = cvs->versions; cv; cv = cv->next) {
 	if (cvs_is_trunk (&cv->number) &&
@@ -620,10 +677,19 @@ rev_list_cvs (cvs_file *cvs)
     /*
      * Generate trunk branch
      */
-    if (ctrunk)
+    if (ctrunk) {
+#if DEBUG
+	printf("rev_list_cvs: ctrunk = %p number:", ctrunk);
+	dump_cvs_number(&ctrunk->number);
+	printf("\n");
+#endif
 	trunk_number = ctrunk->number;
-    else
+    } else {
+#if DEBUG
+	printf("couldn't find ctrunk, faking it\n");
+#endif
 	trunk_number = lex_number ("1.1");
+    }
     trunk = rev_branch_cvs (cvs, &trunk_number);
     if (trunk) {
 	t = rev_list_add_head (rl, trunk, atom ("master"), 2);
@@ -637,13 +703,27 @@ rev_list_cvs (cvs_file *cvs)
 #endif
     
     for (cv = cvs->versions; cv; cv = cv->next) {
+#if DEBUG
+	dump_cvs_version(cv);
+#endif
 	for (cb = cv->branches; cb; cb = cb->next)
 	{
+#if DEBUG
+	    dump_branch(cb);
+#endif
 	    branch = rev_branch_cvs (cvs, &cb->number);
 	    rev_list_add_head (rl, branch, NULL, 0);
 	}
     }
+#if DEBUG
+    printf ("generate file\n");
+#endif
     generate_files(cvs);
+
+#if DEBUG
+    printf ("do revlist stuff\n");
+#endif
+    
     rev_list_patch_vendor_branch (rl, cvs);
     rev_list_graft_branches (rl, cvs);
     rev_list_set_refs (rl, cvs);
@@ -651,5 +731,8 @@ rev_list_cvs (cvs_file *cvs)
     rev_list_set_tail (rl);
     rev_list_free_dead_files (rl);
     rev_list_validate (rl);
+
+    printf("rev_list_cvs: done\n");
+//    dump_cvs_file(cvs);
     return rl;
 }
