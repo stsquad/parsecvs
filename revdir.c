@@ -66,6 +66,10 @@ rev_pack_dir (rev_file **files, int nfiles)
 	}
     }
     h = malloc (sizeof (rev_dir_hash) + nfiles * sizeof (rev_file *));
+    if( h == NULL ) {
+	perror("rev_pack_dir");
+	exit(EXIT_FAILURE);
+    }
     h->next = *bucket;
     *bucket = h;
     h->hash = hash;
@@ -110,8 +114,13 @@ rev_pack_files (rev_file **files, int nfiles, int *ndr)
     int	    nds = 0;
     rev_dir *rd;
     
-    if (!rds)
+    if (!rds) {
 	rds = malloc ((sds = 16) * sizeof (rev_dir *));
+	if( rds == NULL ) {
+		perror("rev_pack_files");
+		exit(EXIT_FAILURE);
+	}
+    }
 	
     /* order by name */
     qsort (files, nfiles, sizeof (rev_file *), compare_names);
@@ -122,8 +131,13 @@ rev_pack_files (rev_file **files, int nfiles, int *ndr)
 	{
 	    if (i > start) {
 		rd = rev_pack_dir (files + start, i - start);
-		if (nds == sds)
+		if (nds == sds) {
 		    rds = realloc (rds, (sds *= 2) * sizeof (rev_dir *));
+		    if( rds == NULL ) {
+			perror("rev_pack_files");
+			exit(EXIT_FAILURE);
+		    }
+		}
 		rds[nds++] = rd;
 	    }
 	    start = i;
@@ -136,8 +150,13 @@ rev_pack_files (rev_file **files, int nfiles, int *ndr)
 	}
     }
     rd = rev_pack_dir (files + start, nfiles - start);
-    if (nds == sds)
-    	    rds = realloc (rds, (sds *= 2) * sizeof (rev_dir *));
+    if (nds == sds) {
+    	rds = realloc (rds, (sds *= 2) * sizeof (rev_dir *));
+	if( nds == NULL ) {
+	    perror("rev_pack_files");
+	    exit(EXIT_FAILURE);
+	}
+    }
     rds[nds++] = rd;
     
     *ndr = nds;

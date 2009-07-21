@@ -322,6 +322,10 @@ static void dump_tags(rev_list *rl, char *title, char *shape)
 	;
 
     v = calloc(count, sizeof(*v));
+    if( v == NULL ) {
+	perror("dump_tags");
+	exit(EXIT_FAILURE);
+    }
 
     for (r = all_tags, i = 0; r; r = r->next)
 	v[i++].t = r;
@@ -492,6 +496,10 @@ rev_list_file (char *name, int *nversions)
     yyfilename = name;
     yylineno = 0;
     this_file = calloc (1, sizeof (cvs_file));
+    if( this_file == NULL ) {
+	perror("rev_list_file");
+	exit(EXIT_FAILURE);
+    }
     this_file->name = name;
     if (yyin)
 	assert (fstat (fileno (yyin), &buf) == 0);
@@ -848,6 +856,10 @@ main (int argc, char **argv)
 		break;
 	}
 	fn = calloc (1, sizeof (rev_filename));
+	if( fn == NULL ) {
+		perror("main");
+		exit(EXIT_FAILURE);
+	}
 	fn->file = atom (file);
 	*fn_tail = fn;
 	fn_tail = &fn->next;

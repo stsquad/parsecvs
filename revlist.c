@@ -31,6 +31,10 @@ rev_list_add_head (rev_list *rl, rev_commit *commit, char *name, int degree)
     while (*list)
 	list = &(*list)->next;
     r = calloc (1, sizeof (rev_ref));
+    if( r == NULL ) {
+    	perror("rev_list_add_head");
+	exit(EXIT_FAILURE);
+    }
     r->commit = commit;
     r->name = name;
     r->next = *list;
@@ -436,8 +440,13 @@ rev_commit_build (rev_commit **commits, rev_commit *leader, int ncommit)
 	free (files);
 	files = 0;
     }
-    if (!files)
+    if (!files) {
 	files = malloc ((sfiles = ncommit) * sizeof (rev_file *));
+	if( files == NULL ) {
+	    perror("rev_commit_build");
+	    exit(EXIT_FAILURE);
+	}
+    }
     
     nfile = 0;
     for (n = 0; n < ncommit; n++)
@@ -453,6 +462,10 @@ rev_commit_build (rev_commit **commits, rev_commit *leader, int ncommit)
         
     commit = calloc (1, sizeof (rev_commit) +
 		     nds * sizeof (rev_dir *));
+    if( commit == NULL ) {
+	perror("rev_commit_build");
+	exit(EXIT_FAILURE);
+    }
     
     commit->date = leader->date;
     commit->commitid = leader->commitid;
@@ -602,6 +615,11 @@ rev_branch_merge (rev_ref **branches, int nbranch,
 	rev_commit **p;
 	int lazy = 0;
 	time_t start = 0;
+
+	if( commits == NULL ) {
+	    perror("rev_branch_merge");
+	    exit(EXIT_FAILURE);
+	}
 
 	nlive = 0;
 	for (n = 0; n < nbranch; n++) {
@@ -949,6 +967,15 @@ rev_list_merge (rev_list *head)
     rev_ref	**refs = calloc (count, sizeof (rev_ref *));
     int		nref;
 
+    if( rl == NULL ) {
+	perror("rev_list_merge");
+	exit(EXIT_FAILURE);
+    }
+    if( refs == NULL ) {
+	perror("rev_list_merge");
+	exit(EXIT_FAILURE);
+    }
+
     /*
      * Find all of the heads across all of the incoming trees
      * Yes, this is currently very inefficient
@@ -1053,6 +1080,11 @@ rev_file_rev (char *name, cvs_number *n, time_t date)
 {
     rev_file	*f = calloc (1, sizeof (rev_file));
 
+    if( f == NULL ) {
+	perror("rev_file_rev");
+	exit(EXIT_FAILURE);
+    }
+
     f->name = name;
     f->number = *n;
     f->date = date;
@@ -1136,6 +1168,10 @@ rev_uniq_file (rev_commit *uniq, rev_commit *common, int *nuniqp)
 	for (j = 0; j < dir->nfiles; j++)
 	    if (!rev_commit_has_file (common, dir->files[j])) {
 		fl = calloc (1, sizeof (rev_file_list));
+		if( fl == NULL ) {
+		    perror("rev_uniq_file");
+		    exit(EXIT_FAILURE);
+		}
 		fl->file = dir->files[j];
 		*tail = fl;
 		tail = &fl->next;
@@ -1163,6 +1199,11 @@ rev_diff *
 rev_commit_diff (rev_commit *old, rev_commit *new)
 {
     rev_diff	*diff = calloc (1, sizeof (rev_diff));
+
+    if( diff == NULL ) {
+	perror("rev_commit_diff");
+	exit(EXIT_FAILURE);
+    }
 
     diff->del = rev_uniq_file (old, new, &diff->ndel);
     diff->add = rev_uniq_file (new, old, &diff->nadd);

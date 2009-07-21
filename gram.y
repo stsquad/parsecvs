@@ -100,6 +100,10 @@ symbols		: symbols symbol
 symbol		: name COLON NUMBER
 		  {
 			$$ = calloc (1, sizeof (cvs_symbol));
+			if( $$ == NULL ) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 			$$->name = $1;
 			$$->number = $3;
 		  }
@@ -125,6 +129,10 @@ revisions	: revisions revision
 revision	: NUMBER date author state branches next opt_commitid
 		  {
 			$$ = calloc (1, sizeof (cvs_version));
+			if( $$ == NULL ) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 			$$->number = $1;
 			$$->date = $2;
 			$$->author = $3;
@@ -154,6 +162,10 @@ branches	: BRANCHES numbers SEMI
 numbers		: NUMBER numbers
 		  {
 			$$ = calloc (1, sizeof (cvs_branch));
+			if( $$ == NULL ) {
+				perror(NULL);
+				exit(EXIT_FAILURE);
+			}
 			$$->next = $2;
 			$$->number = $1;
 			hash_branch($$);
@@ -187,6 +199,10 @@ patches		: patches patch
 		;
 patch		: NUMBER log text
 		  { $$ = calloc (1, sizeof (cvs_patch));
+		    if( $$ == NULL ) {
+			    perror(NULL);
+			    exit(EXIT_FAILURE);
+		    }
 		    $$->number = $1;
 		    $$->log = $2;
 		    $$->text = $3;

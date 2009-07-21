@@ -206,6 +206,10 @@ git_load_author_map (char *filename)
 	    return 0;
 	}
 	a = calloc (1, sizeof (cvs_author));
+	if( a == NULL ) {
+		perror("git_load_author_map");
+		exit(EXIT_FAILURE);
+	}
 	a->name = name;
 	angle = strchr (full, '<');
 	if (!angle) {
