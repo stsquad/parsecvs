@@ -74,11 +74,11 @@ atom (char *string)
 	    return b->string;
 	head = &(b->next);
     }
-    b = malloc (sizeof (hash_bucket_t) + len + 1);
-    if( b == NULL ) {
+    ALLOC((b = malloc (sizeof (hash_bucket_t) + len + 1)), "atom");
+    /*if( b == NULL ) {
     	perror("atom");
 	exit(EXIT_FAILURE);
-    }
+    }*/
     b->next = 0;
     b->crc = crc;
     memcpy (b->string, string, len + 1);

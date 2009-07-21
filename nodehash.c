@@ -29,11 +29,7 @@ static Node *hash_number(cvs_number *n)
 		if (i == key.c)
 			return p;
 	}
-	p = calloc(1, sizeof(Node));
-	if( p == NULL ) {
-		perror("hash_number");
-		exit(EXIT_FAILURE);
-	}
+	ALLOC((p = calloc(1, sizeof(Node))), "hash_number");
 	p->number = key;
 	p->hash_next = table[hash];
 	table[hash] = p;
@@ -167,13 +163,11 @@ static void try_pair(Node *a, Node *b)
 
 void build_branches(void)
 {
-	Node **v = malloc(sizeof(Node *) * entries), **p = v;
-	if( v == NULL ) {
-		perror("build_branches");
-		exit(EXIT_FAILURE);
-	}
+	Node **v, **p;
 	int i;
 
+	ALLOC((v = malloc(sizeof(Node *) * entries)), "build_branches");
+	p = v;
 	for (i = 0; i < 4096; i++) {
 		Node *q;
 		for (q = table[i]; q; q = q->hash_next)

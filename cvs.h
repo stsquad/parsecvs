@@ -40,6 +40,12 @@
 #define CVS_MAX_DEPTH	20
 #define CVS_MAX_REV_LEN	(CVS_MAX_DEPTH * 11)
 
+#define ALLOC(arg, ctx) \
+	if( arg == NULL ) { \
+		perror(ctx); \
+		exit(EXIT_FAILURE); \
+	}
+
 typedef struct _cvs_number {
     int			c;
     short		n[CVS_MAX_DEPTH];

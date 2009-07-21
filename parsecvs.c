@@ -321,11 +321,7 @@ static void dump_tags(rev_list *rl, char *title, char *shape)
     for (r = all_tags, count = 0; r; r = r->next, count++)
 	;
 
-    v = calloc(count, sizeof(*v));
-    if( v == NULL ) {
-	perror("dump_tags");
-	exit(EXIT_FAILURE);
-    }
+    ALLOC((v = calloc(count, sizeof(*v))), "dump_tags");
 
     for (r = all_tags, i = 0; r; r = r->next)
 	v[i++].t = r;
@@ -495,7 +491,7 @@ rev_list_file (char *name, int *nversions)
     }
     yyfilename = name;
     yylineno = 0;
-    this_file = calloc (1, sizeof (cvs_file));
+    ALLOC((this_file = calloc (1, sizeof (cvs_file))), "rev_list_file");
     if( this_file == NULL ) {
 	perror("rev_list_file");
 	exit(EXIT_FAILURE);
@@ -551,7 +547,7 @@ dump_splits (rev_list *rl)
 		    if (s->parent == c->parent)
 			break;
 		if (!s) {
-		    s = calloc (1, sizeof (rev_split));
+		    ALLOC((s = calloc (1, sizeof (rev_split))), "dump_splits");
 		    s->parent = c->parent;
 		    s->childa = c;
 		    s->topa = head->commit;
@@ -855,11 +851,7 @@ main (int argc, char **argv)
 	    if (!file)
 		break;
 	}
-	fn = calloc (1, sizeof (rev_filename));
-	if( fn == NULL ) {
-		perror("main");
-		exit(EXIT_FAILURE);
-	}
+	ALLOC((fn = calloc (1, sizeof (rev_filename))), "main");
 	fn->file = atom (file);
 	*fn_tail = fn;
 	fn_tail = &fn->next;

@@ -90,11 +90,7 @@ struct varbuf {
 static inline void addbuf(struct varbuf *buf, char c)
 {
 	if (buf->cur == buf->len) {
-		buf->string = realloc(buf->string, buf->len *= 2);
-		if( buf->string == YY_NULL ) {
-			perror("addbuf");
-			exit(EXIT_FAILURE);
-		}
+		ALLOC((buf->string = realloc(buf->string, buf->len *= 2)), "addbuf");
 	}
 	buf->string[buf->cur++] = c;
 }
@@ -108,11 +104,7 @@ parse_data (int strip)
 
     buf.cur = 0;
     buf.len = 256;
-    buf.string = malloc(buf.len);
-    if( buf.string == YY_NULL ) {
-    	perror("parse_data");
-	exit(EXIT_FAILURE);
-    }
+    ALLOC((buf.string = malloc(buf.len)), "parse_data");
 
     if (!strip)
     	addbuf(&buf, '@');

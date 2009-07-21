@@ -30,11 +30,7 @@ rev_list_add_head (rev_list *rl, rev_commit *commit, char *name, int degree)
 
     while (*list)
 	list = &(*list)->next;
-    r = calloc (1, sizeof (rev_ref));
-    if( r == NULL ) {
-    	perror("rev_list_add_head");
-	exit(EXIT_FAILURE);
-    }
+    ALLOC((r = calloc (1, sizeof (rev_ref))), "rev_list_add_head");
     r->commit = commit;
     r->name = name;
     r->next = *list;
@@ -441,11 +437,7 @@ rev_commit_build (rev_commit **commits, rev_commit *leader, int ncommit)
 	files = 0;
     }
     if (!files) {
-	files = malloc ((sfiles = ncommit) * sizeof (rev_file *));
-	if( files == NULL ) {
-	    perror("rev_commit_build");
-	    exit(EXIT_FAILURE);
-	}
+	ALLOC((files = malloc ((sfiles = ncommit) * sizeof (rev_file *))), "rev_commit_build");
     }
     
     nfile = 0;
@@ -460,12 +452,8 @@ rev_commit_build (rev_commit **commits, rev_commit *leader, int ncommit)
     
     rds = rev_pack_files (files, nfile, &nds);
         
-    commit = calloc (1, sizeof (rev_commit) +
-		     nds * sizeof (rev_dir *));
-    if( commit == NULL ) {
-	perror("rev_commit_build");
-	exit(EXIT_FAILURE);
-    }
+    ALLOC((commit = calloc (1, sizeof (rev_commit) +
+		     nds * sizeof (rev_dir *))), "rev_commit_build");
     
     commit->date = leader->date;
     commit->commitid = leader->commitid;
@@ -609,18 +597,14 @@ rev_branch_merge (rev_ref **branches, int nbranch,
 	int n;
 	rev_commit *prev = NULL;
 	rev_commit *head = NULL, **tail = &head;
-	rev_commit **commits = calloc (nbranch, sizeof (rev_commit *));
+	rev_commit **commits;
 	rev_commit *commit;
 	rev_commit *latest;
 	rev_commit **p;
 	int lazy = 0;
 	time_t start = 0;
 
-	if( commits == NULL ) {
-	    perror("rev_branch_merge");
-	    exit(EXIT_FAILURE);
-	}
-
+	ALLOC((commits = calloc (nbranch, sizeof (rev_commit *))), "rev_branch_merge");
 	nlive = 0;
 	for (n = 0; n < nbranch; n++) {
 		rev_commit *c;
@@ -960,22 +944,15 @@ rev_list *
 rev_list_merge (rev_list *head)
 {
     int		count = rev_list_count (head);
-    rev_list	*rl = calloc (1, sizeof (rev_list));
+    rev_list	*rl;
     rev_list	*l;
     rev_ref	*lh, *h;
     Tag		*t;
-    rev_ref	**refs = calloc (count, sizeof (rev_ref *));
+    rev_ref	**refs;
     int		nref;
 
-    if( rl == NULL ) {
-	perror("rev_list_merge");
-	exit(EXIT_FAILURE);
-    }
-    if( refs == NULL ) {
-	perror("rev_list_merge");
-	exit(EXIT_FAILURE);
-    }
-
+    ALLOC((rl = calloc (1, sizeof (rev_list))), "rev_list_merge");
+    ALLOC((refs = calloc (count, sizeof (rev_ref *))), "rev_list_merge");
     /*
      * Find all of the heads across all of the incoming trees
      * Yes, this is currently very inefficient
@@ -1078,12 +1055,8 @@ rev_file_free_marked (void)
 rev_file *
 rev_file_rev (char *name, cvs_number *n, time_t date)
 {
-    rev_file	*f = calloc (1, sizeof (rev_file));
-
-    if( f == NULL ) {
-	perror("rev_file_rev");
-	exit(EXIT_FAILURE);
-    }
+    rev_file	*f;
+    ALLOC((f = calloc (1, sizeof (rev_file))), "rev_file_rev");
 
     f->name = name;
     f->number = *n;
@@ -1167,11 +1140,7 @@ rev_uniq_file (rev_commit *uniq, rev_commit *common, int *nuniqp)
 	rev_dir	*dir = uniq->dirs[i];
 	for (j = 0; j < dir->nfiles; j++)
 	    if (!rev_commit_has_file (common, dir->files[j])) {
-		fl = calloc (1, sizeof (rev_file_list));
-		if( fl == NULL ) {
-		    perror("rev_uniq_file");
-		    exit(EXIT_FAILURE);
-		}
+		ALLOC((fl = calloc (1, sizeof (rev_file_list))), "rev_uniq_file");
 		fl->file = dir->files[j];
 		*tail = fl;
 		tail = &fl->next;
@@ -1198,12 +1167,8 @@ rev_file_list_has_filename (rev_file_list *fl, char *name)
 rev_diff *
 rev_commit_diff (rev_commit *old, rev_commit *new)
 {
-    rev_diff	*diff = calloc (1, sizeof (rev_diff));
-
-    if( diff == NULL ) {
-	perror("rev_commit_diff");
-	exit(EXIT_FAILURE);
-    }
+    rev_diff	*diff;
+    ALLOC((diff = calloc (1, sizeof (rev_diff))), "rev_commit_diff");
 
     diff->del = rev_uniq_file (old, new, &diff->ndel);
     diff->add = rev_uniq_file (new, old, &diff->nadd);

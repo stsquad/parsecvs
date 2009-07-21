@@ -25,11 +25,7 @@ static Tag *find_tag(char *name)
 	for (tag = table[hash]; tag; tag = tag->hash_next)
 		if (tag->name == name)
 			return tag;
-	tag = calloc(1, sizeof(Tag));
-	if( tag == NULL ) {
-	    perror("find_tag");
-	    exit(EXIT_FAILURE);
-	}
+	ALLOC((tag = calloc(1, sizeof(Tag))), "find_tag");
 	tag->name = name;
 	tag->hash_next = table[hash];
 	table[hash] = tag;
@@ -49,11 +45,8 @@ void tag_commit(rev_commit *c, char *name)
 	}
 	tag->last = this_file->name;
 	if (!tag->left) {
-		Chunk *v = malloc(sizeof(Chunk));
-		if( v == NULL ) {
-		    perror("tag_commit");
-		    exit(EXIT_FAILURE);
-		}
+		Chunk *v;
+		ALLOC((v = malloc(sizeof(Chunk))), "tag_commit");
 		v->next = tag->commits;
 		tag->commits = v;
 		tag->left = Ncommits;
@@ -67,11 +60,8 @@ rev_commit **tagged(Tag *tag)
 	rev_commit **v = NULL;
 
 	if (tag->count) {
-		rev_commit **p = malloc(tag->count * sizeof(*p));
-		if( p == NULL ) {
-		    perror("tagged");
-		    exit(EXIT_FAILURE);
-		}
+		rev_commit **p;
+		ALLOC((p = malloc(tag->count * sizeof(*p))), "tagged");
 		Chunk *c = tag->commits;
 		int n = Ncommits - tag->left;
 
