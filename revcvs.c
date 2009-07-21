@@ -18,7 +18,9 @@
 
 #include "cvs.h"
 
-#define DEBUG 1
+#ifndef DEBUG
+#define DEBUG 0
+#endif
 
 
 /*
@@ -652,8 +654,10 @@ rev_list_cvs (cvs_file *cvs)
     rev_ref	*t;
     cvs_version	*ctrunk = NULL;
 
+#if DEBUG
     printf("rev_list_cvs: %p\n", cvs);
     dump_cvs_file(cvs);
+#endif
 
     ALLOC((rl = calloc (1, sizeof (rev_list))), "rev_list_cvs");
     
@@ -732,7 +736,9 @@ rev_list_cvs (cvs_file *cvs)
     rev_list_free_dead_files (rl);
     rev_list_validate (rl);
 
+#if DEBUG
     printf("rev_list_cvs: done\n");
 //    dump_cvs_file(cvs);
+#endif
     return rl;
 }

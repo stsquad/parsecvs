@@ -28,7 +28,9 @@
 #include <stdarg.h>
 #include "cvs.h"
 
-#define DEBUG 1
+#ifndef DEBUG
+#define DEBUG 0
+#endif
 
 typedef unsigned char uchar;
 struct alloclist {
